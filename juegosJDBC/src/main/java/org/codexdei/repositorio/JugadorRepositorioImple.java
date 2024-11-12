@@ -5,10 +5,7 @@ import org.codexdei.util.ConexionBaseDatos;
 
 import org.codexdei.util.ConexionBaseDatos;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,14 +34,33 @@ public class JugadorRepositorioImple implements Repositorio<Jugador> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return listaPuntaje;
     }
 
     @Override
     public void guardar(Jugador jugador) {
 
+        String sql;
 
+        if (jugador.getIdJugador() != null && jugador.getIdJugador() > 30){
+
+            sql = "UPDATE puntuacion SET alias=?, puntaje=?, fecha_registro=? WHERE idjugador=30";
+
+        }else {
+            sql = "INSERT INTO puntuacion(alias,puntaje,fecha_registro) VALUES(?,?,?)";
+        }
+
+        try(PreparedStatement stmt = ConexionBaseDatos.generarConexion().prepareStatement(sql)){
+
+                stmt.setString(1, jugador.getAlias());
+                stmt.setLong(2,jugador.getPuntaje());
+                stmt.setDate(3,new Date(jugador.getFechaRegistro().getTime()));
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
     }
 

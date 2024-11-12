@@ -4,22 +4,12 @@ import java.util.Date;
 
 public class Jugador {
 
-    private int idJugador = 0;
+    private Integer idJugador = 0;
     private String alias;
     private Long puntaje;
     private Date fechaRegistro;
-    private static int idIncrementar;
 
     public Jugador(){
-        idIncrementar = ++idJugador;
-    }
-
-    public int getIdJugador() {
-        return idJugador;
-    }
-
-    public void setIdJugador(int idJugador) {
-        this.idJugador = idJugador;
     }
 
     public Jugador(String alias, long puntaje, Date fechaRegistro){
@@ -27,6 +17,14 @@ public class Jugador {
         this.alias = alias;
         this.puntaje = puntaje;
         this.fechaRegistro = fechaRegistro;
+    }
+
+    public Integer getIdJugador() {
+        return idJugador;
+    }
+
+    public void setIdJugador(Integer idJugador) {
+        this.idJugador = idJugador;
     }
 
     public String getAlias(){
