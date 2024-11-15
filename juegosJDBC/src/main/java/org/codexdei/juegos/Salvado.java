@@ -477,7 +477,7 @@ public class Salvado {
     public static void mostrarTablaPuntuaciones(){
 
         Repositorio repoMostrartablaPuntuacion = new JugadorRepositorioImple();
-
+        System.out.println("************** TABLA PUNTUACION *******************");
         repoMostrartablaPuntuacion.mostrarTabla().forEach(System.out::println);
     }
 

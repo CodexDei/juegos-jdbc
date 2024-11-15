@@ -13,7 +13,7 @@ public class ConexionBaseDatos {
 
     public static Connection generarConexion() throws SQLException {
 
-        if (conexion == null) {
+        if (conexion == null || conexion.isClosed()) {
 
             conexion = DriverManager.getConnection(url,usuario,password);
         }

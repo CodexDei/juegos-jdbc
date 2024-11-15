@@ -22,67 +22,69 @@ public class JugadorRepositorioImple implements Repositorio<Jugador> {
         List<Jugador> listaPuntaje = new ArrayList<>();
 
         // Comandos SQL
-        String sql_tablaTemporal = "CREATE TEMPORARY TABLE temp_puntuacion (alias VARCHAR(255), puntaje INT, fecha_registro DATE);";
-        String sql_copiarDatosATemporal = "INSERT INTO temp_puntuacion (alias, puntaje, fecha_registro) " +
-                "SELECT alias, puntaje, fecha_registro FROM puntuacion ORDER BY puntaje DESC;";
-        String sql_vaciarPuntuacion = "TRUNCATE TABLE puntuacion;";
-        String sql_reinsertarDatosPuntuacion = "INSERT INTO puntuacion (alias, puntaje, fecha_registro) " +
+        String sql_crearTablaTemporal = "CREATE TEMPORARY TABLE temp_puntuacion AS " +
+                "SELECT alias, puntaje, fecha_registro " +
+                "FROM puntuacion ORDER BY puntaje DESC;";
+        String sql_vaciarTablaPuntuacion = "TRUNCATE TABLE puntuacion;";
+        String sql_reinsertarDatos = "INSERT INTO puntuacion (alias, puntaje, fecha_registro) " +
                 "SELECT alias, puntaje, fecha_registro FROM temp_puntuacion;";
         String sql_borrarTablaTemporal = "DROP TEMPORARY TABLE temp_puntuacion;";
-        String sql_tablaPuntacionMayorAMenor = "SELECT * FROM puntuacion ORDER BY puntaje DESC;";
+        String sql_obtenerTablaOrdenada = "SELECT * FROM puntuacion ORDER BY idpuntuacion;";
 
         try (Connection connection = generarConexionBaseDatos()) {
-            // Desactivar el autocommit para manejar la transacción manualmente
-            connection.setAutoCommit(false);
+            connection.setAutoCommit(false); // Desactivar autocommit
 
-            try (PreparedStatement stmt_tablaTemporal = connection.prepareStatement(sql_tablaTemporal);
-                 PreparedStatement stmt_copiarDatosATemporal = connection.prepareStatement(sql_copiarDatosATemporal);
-                 PreparedStatement stmt_vaciarPuntuacion = connection.prepareStatement(sql_vaciarPuntuacion);
-                 PreparedStatement stmt_reinsertarDatosPuntuacion = connection.prepareStatement(sql_reinsertarDatosPuntuacion);
+            try (PreparedStatement stmt_crearTablaTemporal = connection.prepareStatement(sql_crearTablaTemporal);
+                 PreparedStatement stmt_vaciarTablaPuntuacion = connection.prepareStatement(sql_vaciarTablaPuntuacion);
+                 PreparedStatement stmt_reinsertarDatos = connection.prepareStatement(sql_reinsertarDatos);
                  PreparedStatement stmt_borrarTablaTemporal = connection.prepareStatement(sql_borrarTablaTemporal);
-                 PreparedStatement stmt_tablaPuntacionMayorAMenor = connection.prepareStatement(sql_tablaPuntacionMayorAMenor)) {
+                 PreparedStatement stmt_obtenerTablaOrdenada = connection.prepareStatement(sql_obtenerTablaOrdenada)) {
 
-                // Crear la tabla temporal
-                stmt_tablaTemporal.execute();
-
-                // Copiar los datos ordenados a la tabla temporal
-                stmt_copiarDatosATemporal.execute();
+                // Crear tabla temporal
+               // System.out.println("Creando tabla temporal...");
+                stmt_crearTablaTemporal.execute();
 
                 // Vaciar la tabla original
-                stmt_vaciarPuntuacion.execute();
+               // System.out.println("Vaciando tabla puntuacion...");
+                stmt_vaciarTablaPuntuacion.execute();
 
-                // Reinsertar los datos en la tabla original
-                stmt_reinsertarDatosPuntuacion.execute();
+                // Reinsertar datos ordenados
+               // System.out.println("Reinsertando datos en tabla puntuacion...");
+                stmt_reinsertarDatos.execute();
 
-                // Eliminar la tabla temporal
+                // Borrar tabla temporal
+               // System.out.println("Eliminando tabla temporal...");
                 stmt_borrarTablaTemporal.execute();
 
-                // Hacer commit de la transacción
+                // Confirmar cambios
                 connection.commit();
+              //  System.out.println("Transacción completada.");
 
-                // Ejecutar la consulta para mostrar la tabla puntuacion ordenada
-                ResultSet rs = stmt_tablaPuntacionMayorAMenor.executeQuery();
-
-                while (rs.next()) {
-                    Jugador j = crearJugador(rs); // Método hipotético para crear un objeto Jugador desde el ResultSet
-                    listaPuntaje.add(j);
+                // Obtener datos ordenados
+                try (ResultSet rs = stmt_obtenerTablaOrdenada.executeQuery()) {
+                    while (rs.next()) {
+                        Jugador jugador = crearJugador(rs);
+                        listaPuntaje.add(jugador);
+                    }
                 }
 
-                rs.close();
-
             } catch (SQLException e) {
-                // Hacer rollback en caso de error
-                connection.rollback();
-                System.err.println("Se ha producido un error. Se hizo rollback de la transacción.");
+                connection.rollback(); // Rollback en caso de error
+                System.err.println("Error durante la transacción: " + e.getMessage());
                 e.printStackTrace();
+            } finally {
+                connection.setAutoCommit(true); // Reactivar autocommit
             }
 
         } catch (SQLException e) {
+            System.err.println("Error al conectar a la base de datos: " + e.getMessage());
             e.printStackTrace();
         }
 
         return listaPuntaje;
     }
+
+
 
 
 
