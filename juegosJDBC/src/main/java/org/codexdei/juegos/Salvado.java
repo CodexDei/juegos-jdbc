@@ -1,14 +1,18 @@
 package org.codexdei.juegos;
 
+import org.codexdei.modelo.Jugador;
+import org.codexdei.repositorio.JugadorRepositorioImple;
+import org.codexdei.repositorio.Repositorio;
+
 import javax.swing.*;
-import java.util.InputMismatchException;
-import java.util.Random;
+import java.util.*;
 
 public class Salvado {
 
     private static boolean estado = false;
+    private static String nombreJugador;
     private static int puntaje = 0;
-    private static int acumulacionPuntaje = 0;
+    private static Long acumulacionPuntaje = 0L;
     private static int bonus = 0;
     private static StringBuilder mensaje;
 
@@ -19,8 +23,9 @@ public class Salvado {
             try {
 
                 String menu = JOptionPane.showInputDialog("Ingrese una opcion valida:\n\n"
-                        + "1. Jugar org.codexdei.juegos.Salvado\n"
-                        + "2. Salir").trim();
+                        + "1. Jugar Salvado\n"
+                        + "2. Mostrar tabla puntuacion\n"
+                        + "3. Salir").trim();
 
                 if (menu.isBlank() || menu == null){
                     JOptionPane.showMessageDialog(null,
@@ -33,18 +38,19 @@ public class Salvado {
 
                 switch (opcionMenu) {
 
-                    case 1:
+                    case 1 ->
 
                         nivelFacil();
-                        break;
 
-                    case 2:
+                    case 2 ->
+
+                        mostrarTablaPuntuaciones();
+
+                    case 3 ->
 
                         estado = true;
-                        break;
 
-
-                    default:
+                    default ->
 
                         throw new IllegalArgumentException("Ingrese solo las opciones del menu");
                 }
@@ -67,6 +73,9 @@ public class Salvado {
 
     private static void nivelFacil() {
 
+        //Ingrese el nombre del jugador
+        nombreJugador = JOptionPane.showInputDialog("Ingrese el nombre del jugador:");
+
         // Array de palabras para adivinar
         String[] palabras = {
                 "casa", "perro", "gato", "libro", "sol", "mesa", "silla", "plato", "arbol", "flor", "biblia", "paz", "perdon",
@@ -81,7 +90,7 @@ public class Salvado {
                 "pantalon", "camisa", "camiseta", "chaqueta", "abrigo", "vestido", "falda", "zapatos", "botas", "zapatillas"
         };
 
-        acumulacionPuntaje = 0;
+        acumulacionPuntaje = 0L;
 
 //         Elegir una palabra aleatoria del array
 //    String palabra = palabras[(int)(Math.random() * palabras.length)];
@@ -104,12 +113,13 @@ public class Salvado {
         int intentos = palabra.length() * 2;
         while (intentos > 0) {
 
-            String letraUsuario = JOptionPane.showInputDialog("NIVEL BALBUCEO\n" + "Adivina la palabra: "
+            String letraUsuario = JOptionPane.showInputDialog("Jugador: " + nombreJugador + "\n" +
+                    "NIVEL BALBUCEO\n" + "Adivina la palabra: "
                     + new String(palabraOculta) + "\n" + "Tienes: " + intentos + " intentos\n" + "Ingresa una letra").trim();
 
             //si ingresa un vacio o espacio
             if (letraUsuario.isBlank()){
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
                         "No puede ingresar un valor en blanco o vacio, ingrese una letra",
                         "INGRESE UN VALOR VALIDO",JOptionPane.WARNING_MESSAGE);
                 continue;
@@ -119,7 +129,8 @@ public class Salvado {
             if (letraUsuario.length() != 1) {
 
                 JOptionPane.showMessageDialog(
-                        null, "Ingrese solo una letra tramposin, por trampos@ pierdes un intento",
+                        null, "Jugador: " + nombreJugador + "\n" +
+                                "Ingrese solo una letra tramposin, por trampos@ pierdes un intento",
                         "CUIDADITO", JOptionPane.WARNING_MESSAGE);
                 --intentos;
                 continue;//Vuelve al ciclo
@@ -139,13 +150,13 @@ public class Salvado {
             // Decrementar el contador de intentos si la letra no se encontró en la palabra
             if (!letraEncontrada) {
                 intentos--;
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
                         "La letra " + "'" + letraUsuario + "'" + " no esta en la palabra, intente de nuevo"
                         , "Letra incorrecta", JOptionPane.WARNING_MESSAGE);
 
             } else if (new String(palabraOculta).equals(palabra)) {
                 // Mostrar mensaje de victoria si el usuario adivinó la palabra
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
                         "¡Felicidades! Has adivinado la palabra: " + palabra);
 
 
@@ -174,9 +185,10 @@ public class Salvado {
 
                 acumulacionPuntaje += puntaje;
 
-                mensaje.append("PUNTAJE: " + puntaje + "\n" + " PUNTAJE ACUMULADO: " + acumulacionPuntaje + "\n");
+                mensaje.append("JUGADOR: " + nombreJugador + "\n" +
+                        "PUNTAJE: " + puntaje + "\n" + " PUNTAJE ACUMULADO: " + acumulacionPuntaje + "\n");
 
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
                         mensaje, "NIVEL BALBUCEO SUPERADO, pasaste al siguiente nivel", JOptionPane.INFORMATION_MESSAGE);
 
                 nivelMedio();
@@ -187,7 +199,8 @@ public class Salvado {
         // Mostrar mensaje de derrota si el usuario se quedó sin intentos
         if (intentos == 0) {
             JOptionPane.showMessageDialog(
-                    null, "¡Oh no! Te has quedado sin intentos. La palabra era: " + palabra);
+                    null, "Jugador: " + nombreJugador + "\n" +
+                    "¡Oh no! Te has quedado sin intentos. La palabra era: " + palabra);
         }
     }
 
@@ -223,20 +236,21 @@ public class Salvado {
         int intentos = palabra.length();
         while (intentos > 0) {
 
-            String letraUsuario = JOptionPane.showInputDialog("NIVEL ESTUDIANTE DE ESPAÑOL\n"
+            String letraUsuario = JOptionPane.showInputDialog("Jugador: " + nombreJugador + "\n" +
+                    "NIVEL ESTUDIANTE DE ESPAÑOL\n"
                     + "PUNTAJE ACUMULADO: " + acumulacionPuntaje + "\n" + "Intentos: " + intentos + "\n"
                     + "Adivina la Palabra: " + new String(palabraOculta) + "\n"
                     + "Ingrese una letra: (si es un nombre la primera letra es mayuscula)").trim();
 
             if (letraUsuario.isBlank()){
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
                         "No puede ingresar un valor en blanco o vacio, ingrese una letra",
                         "INGRESE UN VALOR VALIDO",JOptionPane.WARNING_MESSAGE);
                 continue;
             }
 
             if (letraUsuario.length() != 1) {
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
                         "Ingrese solo una letra tramposin, se te quitara 1 intento por tramposo",
                         "TRAMPOSO", JOptionPane.WARNING_MESSAGE);
                 --intentos;
@@ -256,12 +270,12 @@ public class Salvado {
             }
             if (!letraEncontrada) {
                 --intentos;
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
                         "La letra " + "'" + letraUsuario + "'" + " no esta en la palabra, intente de nuevo"
                         , "Letra incorrecta", JOptionPane.WARNING_MESSAGE);
 
             } else if (new String(palabraOculta).equals(palabra)) {
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null,"Jugador: " + nombreJugador + "\n" +
                         "Felicitaciones, adivinaste la palabra: " + palabra, "ADIVINASTE LA PALABRA", JOptionPane.INFORMATION_MESSAGE);
                 mensaje = new StringBuilder("NIVEL BALBUCEO SUPERADO\n");
 
@@ -284,9 +298,10 @@ public class Salvado {
 
                 acumulacionPuntaje += puntaje;
 
-                mensaje.append("PUNTAJE: " + puntaje + "\n" + " PUNTAJE ACUMULADO: " + acumulacionPuntaje + "\n");
+                mensaje.append("JUGADOR: " + nombreJugador + "\n" +
+                        "PUNTAJE: " + puntaje + "\n" + " PUNTAJE ACUMULADO: " + acumulacionPuntaje + "\n");
 
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
                         mensaje, "NIVEL BALBUCEO SUPERADO, pasaste al siguiente nivel", JOptionPane.INFORMATION_MESSAGE);
 
                 nivelDificil();
@@ -297,11 +312,14 @@ public class Salvado {
         }
         // Mostrar mensaje de derrota si el usuario se quedó sin intentos
         if (intentos == 0) {
-            JOptionPane.showMessageDialog(
-                    null, "¡Oh no! Te has quedado sin intentos. La palabra era: " + palabra);
+            JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
+                    "¡Oh no! Te has quedado sin intentos. La palabra era: " + palabra);
 
-            JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null, "JUGADOR: " + nombreJugador + "\n" +
                     "PUNTAJE: " + puntaje + "\n" + " PUNTAJE ACUMULADO: " + acumulacionPuntaje + "\n");
+
+            guardarPuntaje();
+            mostrarTablaPuntuaciones();
         }
         //Reiniciar juego
 //        salvado();
@@ -343,11 +361,12 @@ public class Salvado {
         int intentos = (palabra.length() / 4);
         while (intentos > 0) {
 
-            String letraUsuario = JOptionPane.showInputDialog("NIVEL LINGÜISTA\n" + "Adivina la palabra: "
+            String letraUsuario = JOptionPane.showInputDialog("Jugador: " + nombreJugador + "\n" +
+                    "NIVEL LINGÜISTA\n" + "Adivina la palabra: "
                     + new String(palabraOculta) + "\n" + "Tienes: " + intentos + " intentos\n" + "Ingresa una letra").trim();
 
             if (letraUsuario.isBlank()){
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null,"Jugador: " + nombreJugador + "\n" +
                         "No puede ingresar un valor en blanco o vacio, ingrese una letra",
                         "INGRESE UN VALOR VALIDO",JOptionPane.WARNING_MESSAGE);
                 continue;
@@ -356,7 +375,8 @@ public class Salvado {
             if (letraUsuario.length() != 1) {
 
                 JOptionPane.showMessageDialog(
-                        null, "Ingrese solo una letra tramposin, por trampos@ pierdes un intento",
+                        null, "Jugador: " + nombreJugador + "\n" +
+                        "Ingrese solo una letra tramposin, por trampos@ pierdes un intento",
                         "CUIDADITO", JOptionPane.WARNING_MESSAGE);
                 --intentos;
                 continue;//Vuelve al ciclo
@@ -376,13 +396,13 @@ public class Salvado {
             // Decrementar el contador de intentos si la letra no se encontró en la palabra
             if (!letraEncontrada) {
                 intentos--;
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null,"Jugador: " + nombreJugador + "\n" +
                         "La letra " + "'" + letraUsuario + "'" + " no esta en la palabra, intente de nuevo"
                         , "Letra incorrecta", JOptionPane.WARNING_MESSAGE);
 
             } else if (new String(palabraOculta).equals(palabra)) {
                 // Mostrar mensaje de victoria si el usuario adivinó la palabra
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null,"Jugador: " + nombreJugador + "\n" +
                         "¡Felicidades! Has adivinado la palabra: " + palabra);
 
 
@@ -407,9 +427,10 @@ public class Salvado {
 
                 acumulacionPuntaje += puntaje;
 
-                mensaje.append("PUNTAJE: " + puntaje + "\n" + " PUNTAJE ACUMULADO: " + acumulacionPuntaje + "\n");
+                mensaje.append("JUGADOR: " + nombreJugador + "\n" +
+                        "PUNTAJE: " + puntaje + "\n" + " PUNTAJE ACUMULADO: " + acumulacionPuntaje + "\n");
 
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
                         mensaje, "HAS RESCATADO EL JUEGO\n\n", JOptionPane.INFORMATION_MESSAGE);
 
                 JOptionPane.showMessageDialog(null,
@@ -419,18 +440,45 @@ public class Salvado {
                 JOptionPane.showMessageDialog(null,
                         "ⒻⒶⓂⒾⓁⒾⒶ ⒶⒸⓄⓈⓉⒶ ⓂⓄⓇⒶ");
 
+                guardarPuntaje();
+                mostrarTablaPuntuaciones();
+
                 return;
             }
         }
 
         // Mostrar mensaje de derrota si el usuario se quedó sin intentos
         if (intentos == 0) {
-            JOptionPane.showMessageDialog(
-                    null, "¡Oh no! Te has quedado sin intentos. La palabra era: " + palabra);
+            JOptionPane.showMessageDialog(null,"Jugador: " + nombreJugador + "\n" +
+                    "¡Oh no! Te has quedado sin intentos. La palabra era: " + palabra);
 
-            JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(null, "JUGADOR: " + nombreJugador + "\n" +
                     "PUNTAJE: " + puntaje + "\n" + " PUNTAJE ACUMULADO: " + acumulacionPuntaje + "\n");
+
+            guardarPuntaje();
+            mostrarTablaPuntuaciones();
         }
+    }
+
+    public static void guardarPuntaje(){
+
+        Repositorio repoJugador = new JugadorRepositorioImple();
+
+        Jugador jugador = new Jugador();
+        jugador.setAlias(nombreJugador);
+        jugador.setPuntaje(acumulacionPuntaje);
+        jugador.setFechaRegistro(new Date());
+
+        repoJugador.guardar(jugador);
+
+        System.out.println("PARTIDA GUARDADA!!!");
+    }
+
+    public static void mostrarTablaPuntuaciones(){
+
+        Repositorio repoMostrartablaPuntuacion = new JugadorRepositorioImple();
+
+        repoMostrartablaPuntuacion.mostrarTabla().forEach(System.out::println);
     }
 
 
