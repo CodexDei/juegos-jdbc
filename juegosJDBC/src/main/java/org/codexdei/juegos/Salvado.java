@@ -3,6 +3,7 @@ package org.codexdei.juegos;
 import org.codexdei.modelo.Jugador;
 import org.codexdei.repositorio.JugadorRepositorioImple;
 import org.codexdei.repositorio.Repositorio;
+import org.codexdei.runnable.PlayTime;
 
 import javax.swing.*;
 import java.util.*;
@@ -15,6 +16,12 @@ public class Salvado {
     private static Long acumulacionPuntaje = 0L;
     private static int bonus = 0;
     private static StringBuilder mensaje;
+    private static Thread playTime;
+    //controlar tiempo
+    private static boolean isNivelFacil = false;
+    private static boolean isNivelMedio = false;
+    private static boolean isNivelDificil = false;
+
 
     public static void salvado() {
 
@@ -71,7 +78,11 @@ public class Salvado {
         } while (!estado);
     }
 
-    private static void nivelFacil() {
+    public static void nivelFacil() {
+
+        isNivelFacil = true;
+        isNivelMedio = false;
+        isNivelDificil = false;
 
         //Ingrese el nombre del jugador
         nombreJugador = JOptionPane.showInputDialog("Ingrese el nombre del jugador:");
@@ -111,12 +122,18 @@ public class Salvado {
 
         // Contador de intentos restantes, intentos sera igual al doble de letras
         int intentos = palabra.length() * 2;
+
+        //iniciar tiempo
+        startTime();
+
         while (intentos > 0) {
+
+            //verificar tiempo
+            verificarTiempo();
 
             String letraUsuario = JOptionPane.showInputDialog("Jugador: " + nombreJugador + "\n" +
                     "NIVEL BALBUCEO\n" + "Adivina la palabra: "
                     + new String(palabraOculta) + "\n" + "Tienes: " + intentos + " intentos\n" + "Ingresa una letra").trim();
-
             //si ingresa un vacio o espacio
             if (letraUsuario.isBlank()){
                 JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
@@ -124,7 +141,6 @@ public class Salvado {
                         "INGRESE UN VALOR VALIDO",JOptionPane.WARNING_MESSAGE);
                 continue;
             }
-
 
             if (letraUsuario.length() != 1) {
 
@@ -155,6 +171,8 @@ public class Salvado {
                         , "Letra incorrecta", JOptionPane.WARNING_MESSAGE);
 
             } else if (new String(palabraOculta).equals(palabra)) {
+                //Detener el tiempo
+                playTime.interrupt();
                 // Mostrar mensaje de victoria si el usuario adivinó la palabra
                 JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
                         "¡Felicidades! Has adivinado la palabra: " + palabra);
@@ -190,11 +208,11 @@ public class Salvado {
 
                 JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
                         mensaje, "NIVEL BALBUCEO SUPERADO, pasaste al siguiente nivel", JOptionPane.INFORMATION_MESSAGE);
-
+                isNivelFacil = false;
                 nivelMedio();
                 return;
             }
-        }
+        }//while
 
         // Mostrar mensaje de derrota si el usuario se quedó sin intentos
         if (intentos == 0) {
@@ -203,8 +221,11 @@ public class Salvado {
                     "¡Oh no! Te has quedado sin intentos. La palabra era: " + palabra);
         }
     }
-
     public static void nivelMedio() {
+
+        isNivelMedio = true;
+        isNivelDificil = false;
+        isNivelFacil = false;
 
         String[] palabras = {
                 "mochila", "carpeta", "computadora", "manzana", "Ricardo", "naranja", "Marina", "teclado", "bicicleta", "Samantha",
@@ -234,7 +255,13 @@ public class Salvado {
         }
 
         int intentos = palabra.length();
+
+        //empezar tiempo
+        startTime();
+
         while (intentos > 0) {
+
+            verificarTiempo();
 
             String letraUsuario = JOptionPane.showInputDialog("Jugador: " + nombreJugador + "\n" +
                     "NIVEL ESTUDIANTE DE ESPAÑOL\n"
@@ -275,9 +302,13 @@ public class Salvado {
                         , "Letra incorrecta", JOptionPane.WARNING_MESSAGE);
 
             } else if (new String(palabraOculta).equals(palabra)) {
+                //detener tiempo
+                playTime.interrupt();
                 JOptionPane.showMessageDialog(null,"Jugador: " + nombreJugador + "\n" +
                         "Felicitaciones, adivinaste la palabra: " + palabra, "ADIVINASTE LA PALABRA", JOptionPane.INFORMATION_MESSAGE);
                 mensaje = new StringBuilder("NIVEL BALBUCEO SUPERADO\n");
+                //apagar nivel
+                isNivelMedio = false;
 
                 //puntuacion de acuerdo al numero de intentos
                 if (intentos == palabra.length()) {
@@ -304,6 +335,8 @@ public class Salvado {
                 JOptionPane.showMessageDialog(null, "Jugador: " + nombreJugador + "\n" +
                         mensaje, "NIVEL BALBUCEO SUPERADO, pasaste al siguiente nivel", JOptionPane.INFORMATION_MESSAGE);
 
+                isNivelMedio = false;
+
                 nivelDificil();
                 return;
             }
@@ -326,6 +359,10 @@ public class Salvado {
     }
 
     public static void nivelDificil(){
+
+        isNivelDificil = true;
+        isNivelMedio = false;
+        isNivelFacil = false;
 
         // Array de palabras para adivinar
         String[] palabras = {
@@ -359,7 +396,13 @@ public class Salvado {
 
         // Contador de intentos restantes, intentos sera igual al doble de letras
         int intentos = (palabra.length() / 4);
+        //empezar tiempo
+        startTime();
+
         while (intentos > 0) {
+
+            //verificar tiempo
+            verificarTiempo();
 
             String letraUsuario = JOptionPane.showInputDialog("Jugador: " + nombreJugador + "\n" +
                     "NIVEL LINGÜISTA\n" + "Adivina la palabra: "
@@ -401,10 +444,13 @@ public class Salvado {
                         , "Letra incorrecta", JOptionPane.WARNING_MESSAGE);
 
             } else if (new String(palabraOculta).equals(palabra)) {
+                //detener tiempo
+                playTime.interrupt();
                 // Mostrar mensaje de victoria si el usuario adivinó la palabra
                 JOptionPane.showMessageDialog(null,"Jugador: " + nombreJugador + "\n" +
                         "¡Felicidades! Has adivinado la palabra: " + palabra);
 
+                isNivelDificil = false;
 
                 mensaje = new StringBuilder("NIVEL LINGÜISTA SUPERADO\n");
 
@@ -458,6 +504,41 @@ public class Salvado {
             guardarPuntaje();
             mostrarTablaPuntuaciones();
         }
+    }
+
+
+    private static void startTime(){
+
+        long time = 0L;
+
+        if (isNivelFacil){
+
+            time = 45000L;
+
+        } else if (isNivelMedio){
+
+            time = 30000L;
+
+        } else if (isNivelDificil){
+
+            time = 20000L;
+        }
+
+        playTime = new Thread(new PlayTime(time));
+
+        if (!playTime.isAlive()){
+            playTime.start();
+        }
+    }
+    private static void verificarTiempo() {
+
+        if (!playTime.isAlive()){
+
+            JOptionPane.showMessageDialog(null,
+                        "Tiempo terminado","GAME OVER",JOptionPane.ERROR_MESSAGE);
+            Salvado.salvado();
+        }
+
     }
 
     public static void guardarPuntaje(){
