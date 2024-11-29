@@ -27,6 +27,6 @@ public class PlayTime implements Runnable {
             throw new RuntimeException(e);
         }
         JOptionPane.showMessageDialog(null,
-                "TIEMPO TERMINADO!","GAME OVER",JOptionPane.WARNING_MESSAGE);
+                "¡TIEMPO APUNTO DE TERMINAR!","¡WARNING WARNING!",JOptionPane.WARNING_MESSAGE);
     }
 }

@@ -18,13 +18,14 @@ public class Salvado {
     private static StringBuilder mensaje;
     private static Thread playTime;
     //controlan asignacion del tiempo para los niveles
-    private static boolean timeNivelFacil = false;
-    private static boolean timeNivelMedio = false;
-    private static boolean timeNivelDificil = false;
+    private static final long TIME_LEVEL_FACIL = 50000;
+    private static final long TIME_LEVEL_MEDIO = 45000;
+    private static final long TIME_LEVEL_DIFICIL = 40000;
     //controlan ejecucion de los niveles
     private static final String LEVEL_FACIL = "LEVEL_FACIL";
     private static final String LEVEL_MEDIO = "LEVEL_MEDIO";
     private static final String LEVEL_DIFICIL = "LEVEL_DIFICIL";
+
 
     public static void salvado() {
 
@@ -35,7 +36,7 @@ public class Salvado {
                 nombreJugador = "";
                 puntaje = 0;
                 Long acumulacionPuntaje = 0L;
-                mensaje = null;
+                mensaje = new StringBuilder("");
 
                 String menu = JOptionPane.showInputDialog("Ingrese una opcion valida:\n\n"
                         + "1. Jugar Salvado\n"
@@ -108,13 +109,8 @@ public class Salvado {
 
     public static void nivelFacil() {
 
-        timeNivelFacil = true;
-        timeNivelMedio = false;
-        timeNivelDificil = false;
-
         //Ingrese el nombre del jugador
         nombreJugador = JOptionPane.showInputDialog("Ingrese el nombre del jugador:");
-
         // Array de palabras para adivinar
         String[] palabras = {
                 "casa", "perro", "gato", "libro", "sol", "mesa", "silla", "plato", "arbol", "flor", "biblia", "paz", "perdon",
@@ -152,12 +148,18 @@ public class Salvado {
         int intentos = palabra.length() * 2;
 
         //iniciar tiempo
-        startTime();
+        startTime(TIME_LEVEL_FACIL);
 
         while (intentos > 0) {
 
             //verificar tiempo
-            verificarTiempo();
+            if (!playTime.isAlive()){
+
+                JOptionPane.showMessageDialog(null,
+                        "Tiempo terminado","GAME OVER",JOptionPane.ERROR_MESSAGE);
+                //Reiniciar juego
+                break;
+            }
 
             String letraUsuario = JOptionPane.showInputDialog("Jugador: " + nombreJugador + "\n" +
                     "NIVEL BALBUCEO\n" + "Adivina la palabra: "
@@ -248,16 +250,11 @@ public class Salvado {
                     "¡Oh no! Te has quedado sin intentos. La palabra era: " + palabra);
             //Detener el tiempo
             playTime.interrupt();
-            salvado();
         }
     }
     public static void nivelMedio() {
 
-        timeNivelFacil = false;
-        timeNivelMedio = true;
-        timeNivelDificil = false;
-
-        String[] palabras = {
+       String[] palabras = {
                 "mochila", "carpeta", "computadora", "manzana", "Ricardo", "naranja", "Marina", "teclado", "bicicleta", "Samantha",
                 "pantalon", "Alejandro", "zapatos", "reloj", "cuchillo", "tenedor", "cuchara", "dinosaurio", "elefante", "jirafa",
                 "cuaderno", "cartuchera", "escritorio", "calendario", "calculadora", "guitarra", "violoncello", "piano", "microfono", "televisor",
@@ -287,11 +284,17 @@ public class Salvado {
         int intentos = palabra.length();
 
         //empezar tiempo
-        startTime();
+        startTime(TIME_LEVEL_MEDIO);
 
         while (intentos > 0) {
 
-            verificarTiempo();
+            if (!playTime.isAlive()){
+
+                JOptionPane.showMessageDialog(null,
+                        "Tiempo terminado","GAME OVER",JOptionPane.ERROR_MESSAGE);
+                //Reiniciar juego
+                break;
+            }
 
             String letraUsuario = JOptionPane.showInputDialog("Jugador: " + nombreJugador + "\n" +
                     "NIVEL ESTUDIANTE DE ESPAÑOL\n"
@@ -377,16 +380,10 @@ public class Salvado {
             playTime.interrupt();
             guardarPuntaje();
             mostrarTablaPuntuaciones();
-            //Reiniciar juego
-            salvado();
         }
     }
 
     public static void nivelDificil(){
-
-        timeNivelFacil = false;
-        timeNivelMedio = false;
-        timeNivelDificil = true;
 
         // Array de palabras para adivinar
         String[] palabras = {
@@ -421,12 +418,18 @@ public class Salvado {
         // Contador de intentos restantes, intentos sera igual al doble de letras
         int intentos = (palabra.length() / 4);
         //empezar tiempo
-        startTime();
+        startTime(TIME_LEVEL_DIFICIL);
 
         while (intentos > 0) {
 
             //verificar tiempo
-            verificarTiempo();
+            if (!playTime.isAlive()){
+
+                JOptionPane.showMessageDialog(null,
+                        "Tiempo terminado","GAME OVER",JOptionPane.ERROR_MESSAGE);
+                //Reiniciar juego
+                break;
+            }
 
             String letraUsuario = JOptionPane.showInputDialog("Jugador: " + nombreJugador + "\n" +
                     "NIVEL LINGÜISTA\n" + "Adivina la palabra: "
@@ -510,10 +513,8 @@ public class Salvado {
 
                 guardarPuntaje();
                 mostrarTablaPuntuaciones();
-                //Reiniciar juego
-                salvado();
             }
-        }
+        }//while
 
         // Mostrar mensaje de derrota si el usuario se quedó sin intentos
         if (intentos == 0) {
@@ -526,43 +527,16 @@ public class Salvado {
             playTime.interrupt();
             guardarPuntaje();
             mostrarTablaPuntuaciones();
-            //Reiniciar juego
-            salvado();
         }
     }
 
 
-    private static void startTime(){
+    private static void startTime(long TIME_LEVEL){
 
-        long time = 0L;
-
-        if (timeNivelFacil){
-
-            time = 60000L;
-
-        } else if (timeNivelMedio){
-
-            time = 45000L;
-
-        } else if (timeNivelDificil){
-
-            time = 40000L;
-        }
-
-        playTime = new Thread(new PlayTime(time));
+        playTime = new Thread(new PlayTime(TIME_LEVEL));
 
         if (!playTime.isAlive()){
             playTime.start();
-        }
-    }
-    private static void verificarTiempo() {
-
-        if (!playTime.isAlive()){
-
-            JOptionPane.showMessageDialog(null,
-                        "Tiempo terminado","GAME OVER",JOptionPane.ERROR_MESSAGE);
-            //Reiniciar juego
-            ejecutarNivelesJuego(LEVEL_FACIL);
         }
     }
 
