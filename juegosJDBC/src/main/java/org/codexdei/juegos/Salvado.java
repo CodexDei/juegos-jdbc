@@ -6,6 +6,7 @@ import org.codexdei.repositorio.Repositorio;
 import org.codexdei.runnable.PlayTime;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.*;
 
 public class Salvado {
@@ -25,6 +26,8 @@ public class Salvado {
     private static final String LEVEL_FACIL = "LEVEL_FACIL";
     private static final String LEVEL_MEDIO = "LEVEL_MEDIO";
     private static final String LEVEL_DIFICIL = "LEVEL_DIFICIL";
+    //sonido beep
+    private static Toolkit toolkit = Toolkit.getDefaultToolkit();
 
 
     public static void salvado() {
@@ -93,14 +96,17 @@ public class Salvado {
 
             case LEVEL_FACIL ->{
 
+                toolkit.beep();
                 nivelFacil();
             }
             case LEVEL_MEDIO ->{
 
+                toolkit.beep();
                 nivelMedio();
             }
             case LEVEL_DIFICIL ->{
 
+                toolkit.beep();
                 nivelDificil();
             }
         }
