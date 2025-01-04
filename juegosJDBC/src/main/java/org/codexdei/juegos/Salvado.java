@@ -19,9 +19,9 @@ public class Salvado {
     private static StringBuilder mensaje;
     private static Thread playTime;
     //controlan asignacion del tiempo para los niveles
-    private static final long TIME_LEVEL_FACIL = 50000;
-    private static final long TIME_LEVEL_MEDIO = 45000;
-    private static final long TIME_LEVEL_DIFICIL = 40000;
+    private static final long TIME_LEVEL_FACIL = 180000;
+    private static final long TIME_LEVEL_MEDIO = 160000;
+    private static final long TIME_LEVEL_DIFICIL = 100000;
     //controlan ejecucion de los niveles
     private static final String LEVEL_FACIL = "LEVEL_FACIL";
     private static final String LEVEL_MEDIO = "LEVEL_MEDIO";
